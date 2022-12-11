@@ -1,0 +1,31 @@
+{
+  "name": "todoplusplusback",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "build": "rollup -c",
+    "build-watch": "rollup -c -w",
+    "start": "concurrently --kill-others \"npm run build-watch\" \"node dist\";",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "kevin quing",
+  "license": "ISC",
+  "devDependencies": {
+    "@rollup/plugin-babel": "^6.0.3",
+    "@rollup/plugin-commonjs": "^23.0.4",
+    "@rollup/plugin-typescript": "^10.0.1",
+    "@types/node": "^18.11.13",
+    "@types/sqlite3": "^3.1.8",
+    "concurrently": "^7.6.0",
+    "rollup": "^3.7.2",
+    "tslib": "^2.4.1"
+  },
+  "dependencies": {
+    "fastify": "^4.10.2",
+    "rxjs": "^7.6.0",
+    "sqlite3": "^5.1.2",
+    "ts-pattern": "^4.0.6"
+  }
+}
