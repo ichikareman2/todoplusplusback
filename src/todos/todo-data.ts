@@ -1,64 +1,66 @@
 import db from '../db'
-import { Either, Left, Right } from '../models/Either'
+import {either} from 'fp-ts'
+// import * as E from '../models/Either'
+
 import { Todo } from './todo.model'
 import {Observable} from 'rxjs'
 import * as crypto from 'crypto'
 
 const tbl = 'todos'
-export const fetchAllTodos$ = () => new Observable<Either<Error, Todo[]>>((sub) => {
+export const fetchAllTodos$ = () => new Observable<either.Either<Error, Todo[]>>((sub) => {
   db.all(`SELECT * FROM ${tbl}`, (err: Error, rows: Todo[]) => {
     if (err) {
-      sub.error(new Left(err))
+      sub.error(either.left(err))
     } else {
-      sub.next(new Right(rows))
+      sub.next(either.right(rows))
     }
     sub.complete()
   })
 })
 
-export const updateTodoName$ = (id: Todo['id'], name: Todo['name']) => new Observable<Either<Error, Todo>>((sub) => {
+export const updateTodoName$ = (id: Todo['id'], name: Todo['name']) => new Observable<either.Either<Error, Todo>>((sub) => {
   db.get(
     `UPDATE ${tbl} SET name = ? WHERE id = ?; SELECT * FROM ${tbl} WHERE id = ?`,
     [name, id, id],
     (err: Error, row: Todo) => {
     if (err) {
-      sub.error(new Left(err))
+      sub.error(either.left(err))
     } else if (!row) {
-      sub.error(new Left(new Error('No record found!')))
+      sub.error(either.left(new Error('No record found!')))
     } else {
-      sub.next(new Right(row))
+      sub.next(either.right(row))
     }
     sub.complete()
   })
 })
 
-export const addTodo$ = (name: Todo['name']) => new Observable<Either<Error, Todo>>(sub => {
+export const addTodo$ = (name: Todo['name']) => new Observable<either.Either<Error, Todo>>(sub => {
   const id = crypto.randomUUID()
   db.get(
     `INSERT INTO ${tbl} {id, name, done} VALUES (?, ?, ?); SELECT * FROM ${tbl} WHERE id = ?`,
     [id, name, 0, id],
     (err, row) => {
       if (err) {
-        sub.error(new Left(err))
+        sub.error(either.left(err))
       } else if (!row) {
-        sub.error(new Left(new Error('Record not added!')))
+        sub.error(either.left(new Error('Record not added!')))
       } else {
-        sub.next(new Right(row))
+        sub.next(either.right(row))
       }
       sub.complete()
     }
   )
 })
 
-export const deleteTodo$ = (id: Todo['id']) => new Observable<Either<Error, boolean>>(sub => {
+export const deleteTodo$ = (id: Todo['id']) => new Observable<either.Either<Error, boolean>>(sub => {
   db.run(
     `DELETE FROM ${tbl} WHERE id = ?`,
     [id],
     (err) => {
       if (err) {
-        sub.error(new Left(err))
+        sub.error(either.left(err))
       } else {
-        sub.next(new Right(true))
+        sub.next(either.right(true))
       }
       sub.complete()
     }

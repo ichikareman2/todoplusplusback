@@ -23,7 +23,13 @@
     "tslib": "^2.4.1"
   },
   "dependencies": {
+    "@marblejs/core": "^4.0.3",
+    "@marblejs/http": "^4.0.3",
+    "@marblejs/middleware-body": "^4.0.3",
+    "@marblejs/middleware-io": "^4.0.3",
+    "@marblejs/middleware-logger": "^4.0.3",
     "fastify": "^4.10.2",
+    "fp-ts": "^2.13.1",
     "rxjs": "^7.6.0",
     "sqlite3": "^5.1.2",
     "ts-pattern": "^4.0.6"
