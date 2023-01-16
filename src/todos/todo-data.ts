@@ -2,7 +2,7 @@ import db from '../db'
 import {either} from 'fp-ts'
 // import * as E from '../models/Either'
 
-import { Todo } from './todo.model'
+import { Todo, TodoUpdateRequest } from './todo.model'
 import {Observable} from 'rxjs'
 import * as crypto from 'crypto'
 
@@ -18,10 +18,21 @@ export const fetchAllTodos$ = () => new Observable<either.Either<Error, Todo[]>>
   })
 })
 
-export const updateTodoName$ = (id: Todo['id'], name: Todo['name']) => new Observable<either.Either<Error, Todo>>((sub) => {
+export const getTodoById$ = (id: Todo['id']) => new Observable<either.Either<Error, Todo>>(sub => {
+  db.get(`SELECT * FROM ${tbl} WHERE id = ?`, [id], (err: Error, row: Todo) => {
+    if (err) {
+      sub.error(either.left(err))
+    } else {
+      sub.next(either.right(row))
+    }
+    sub.complete();
+  })
+})
+
+export const updateTodo$ = (id: TodoUpdateRequest['id'], name: TodoUpdateRequest['name'], done: TodoUpdateRequest['done']) => new Observable<either.Either<Error, Todo>>((sub) => {
   db.get(
-    `UPDATE ${tbl} SET name = ? WHERE id = ?; SELECT * FROM ${tbl} WHERE id = ?`,
-    [name, id, id],
+    `UPDATE ${tbl} SET name = ?, done = ? WHERE id = ?; SELECT * FROM ${tbl} WHERE id = ?`,
+    [name, done, id, id],
     (err: Error, row: Todo) => {
     if (err) {
       sub.error(either.left(err))

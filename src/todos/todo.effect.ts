@@ -3,9 +3,9 @@ import { pipe } from 'rxjs'
 import {either} from 'fp-ts'
 // import * as E from '../models/Either'
 import {map, mergeMap} from 'rxjs/operators'
-import { addTodo$, fetchAllTodos$ } from './todo-data'
+import { addTodo$, updateTodo$, fetchAllTodos$ } from './todo-data'
 import {requestValidator$, t} from '@marblejs/middleware-io'
-import { Todo, TodoAdd } from './todo.model'
+import { Todo, TodoAddRequest, TodoUpdateRequest } from './todo.model'
 
 // export const todoEffect$ = r.pipe(
 //   r.matchPath('/'),
@@ -36,9 +36,7 @@ const todoPost$ = r.pipe(
   r.matchPath('/'),
   r.matchType('POST'),
   r.useEffect(req$ => req$.pipe(
-    requestValidator$({
-      body: TodoAdd
-    }),
+    requestValidator$({body: TodoAddRequest}),
     mergeMap(({body}) => addTodo$(body.name)),
     map(either.matchW(
       e => ({
@@ -57,10 +55,8 @@ const todoPut$ = r.pipe(
   r.matchPath('/'),
   r.matchType('PUT'),
   r.useEffect(req$ => req$.pipe(
-    requestValidator$({
-      body: TodoAdd
-    }),
-    mergeMap(({body}) => addTodo$(body.name)),
+    requestValidator$({body: TodoUpdateRequest}),
+    mergeMap(({body}) => updateTodo$(body.id, body.name, body.done)),
     map(either.matchW(
       e => ({
         status: 500,
@@ -77,6 +73,7 @@ const todoPut$ = r.pipe(
 export const todoEffects$ = combineRoutes('/todos', {
   effects: [
     todoGet$,
-    todoPost$
+    todoPost$,
+    todoPut$
   ]
 })
